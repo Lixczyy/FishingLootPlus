@@ -15,7 +15,7 @@ The plugin is built around a simple idea: most catches are still valid fish, but
 - Persistent per-player fishing progression with automatic VIP at 100 catches and God at 500 catches.
 - Public `/lb` leaderboard and `/stats` commands for personal and player statistics.
 - In-game commands for validation, simulation, testing, and admin forcing.
-- Persistent player stats for catches, jackpots, jackpot rate, items, reward drops, and bonus rolls.
+- Persistent player stats for casts, catches, catch rate, jackpots, jackpot rate, items, reward drops, and bonus rolls.
 - Configurable item display names, custom skin IDs, and weighted loot entries.
 
 ## Supported game and framework
@@ -175,12 +175,13 @@ The leaderboard also shows each listed player's jackpot rate.
 ### /stats
 
 Available to everyone. Displays your persistent fishing statistics, effective quantity and jackpot
-multipliers, and leaderboard rank.
+multipliers, leaderboard rank, total casts, total catches, and catch percentage.
 
 ### /stats <player>
 
 Displays the persistent fishing statistics for an online player or a player already recorded in the
-leaderboard. Partial name matches are supported.
+leaderboard, including casts, catches, catch percentage, and all other fishing stats. Partial name
+matches are supported.
 
 ### /fishloot list
 

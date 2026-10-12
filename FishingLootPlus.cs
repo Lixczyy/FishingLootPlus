@@ -35,6 +35,7 @@ namespace Oxide.Plugins
         private class PlayerFishingStats
         {
             public string Name = "";
+            public int Casts;
             public int Catches;
             public int Jackpots;
             public long Items;
@@ -478,7 +479,7 @@ namespace Oxide.Plugins
                 ["Toggled"] = "FishingLootPlus is now {0}.",
                 ["PlayerNotFound"] = "Player '{0}' not found (or not online).",
                 ["Given"] = "Gave {0} a roll: {1}",
-                ["Stats"] = "== Fishing stats: {0} ==\nRank: {1}\nCatches: {2}\nJackpots: {3}\nJackpot rate: {4}%\nItems received: {5}\nReward drops: {6}\nBonus rolls: {7}\nAverage items/catch: {8}\nFishing multiplier: x{9} quantity / x{10} jackpot",
+                ["Stats"] = "== Fishing stats: {0} ==\nRank: {1}\nCasts: {2}\nCatches: {3}\nCatch rate: {4}%\nJackpots: {5}\nJackpot rate: {6}%\nItems received: {7}\nReward drops: {8}\nBonus rolls: {9}\nAverage items/catch: {10}\nFishing multiplier: x{11} quantity / x{12} jackpot",
                 ["Leaderboard"] = "== Fishing leaderboard ==\n{0}",
                 ["Help"] = "FishingLootPlus commands:\n" +
                            "/fishloot reload - reload config\n" +
@@ -547,6 +548,14 @@ namespace Oxide.Plugins
             stats.BonusRolls += result.BonusRolls;
             SavePlayerStats();
             return true;
+        }
+
+        private void OnFishingRodCast(BaseFishingRod rod, BasePlayer player)
+        {
+            if (config == null || !config.Enabled || rod == null || player == null) return;
+            if (config.RequirePermission && !permission.UserHasPermission(player.UserIDString, PermUse)) return;
+
+            RecordCast(player);
         }
 
         #endregion
@@ -832,6 +841,20 @@ namespace Oxide.Plugins
             return stats;
         }
 
+        private void RecordCast(BasePlayer player)
+        {
+            PlayerFishingStats stats;
+            if (!playerStats.TryGetValue(player.UserIDString, out stats))
+            {
+                stats = new PlayerFishingStats();
+                playerStats[player.UserIDString] = stats;
+            }
+
+            stats.Name = player.displayName;
+            stats.Casts++;
+            SavePlayerStats();
+        }
+
         private void GrantCatchPermissions(string userId, PlayerFishingStats stats)
         {
             if (stats == null) return;
@@ -867,20 +890,27 @@ namespace Oxide.Plugins
             {
                 int shown = Math.Min(3, ranked.Count);
                 for (int i = 0; i < shown; i++)
-                    sb.AppendLine("#" + (i + 1) + " " + DisplayStatsName(ranked[i]) + " - " +
-                                  ranked[i].Catches + " catches, " + JackpotRate(ranked[i]) + "% jackpot rate");
+                    sb.AppendLine(LeaderboardLine(i + 1, ranked[i]));
 
                 if (!iplayer.IsServer)
                 {
                     int ownIndex = FindStatsIndex(ranked, iplayer.Id);
                     if (ownIndex >= 0)
-                        sb.Append("Your rank: #" + (ownIndex + 1) + " (" + ranked[ownIndex].Catches + " catches)");
+                        sb.Append("Your rank: " + LeaderboardLine(ownIndex + 1, ranked[ownIndex]));
                     else
                         sb.Append("Your rank: unranked (catch something to enter the leaderboard)");
                 }
             }
 
             iplayer.Reply(Msg("Leaderboard", iplayer.Id, sb.ToString().TrimEnd()));
+        }
+
+        private string LeaderboardLine(int rank, PlayerFishingStats stats)
+        {
+            return "#" + rank + " " + DisplayStatsName(stats) + " - " +
+                   stats.Casts + " casts, " + stats.Catches + " catches, " +
+                   CatchRate(stats) + "% catch rate, " + stats.Jackpots + " jackpots, " +
+                   JackpotRate(stats) + "% jackpot rate, " + stats.Items + " items";
         }
 
         private void CmdStats(IPlayer iplayer, string command, string[] args)
@@ -942,9 +972,9 @@ namespace Oxide.Plugins
             }
 
             iplayer.Reply(Msg("Stats", iplayer.Id, DisplayStatsName(stats), rank > 0 ? "#" + rank : "unranked",
-                stats.Catches, stats.Jackpots, JackpotRate(stats), stats.Items, stats.RewardDrops,
-                stats.BonusRolls, AverageItems(stats), quantityMultiplier.ToString("0.00"),
-                jackpotMultiplier.ToString("0.00")));
+                stats.Casts, stats.Catches, CatchRate(stats), stats.Jackpots, JackpotRate(stats),
+                stats.Items, stats.RewardDrops, stats.BonusRolls, AverageItems(stats),
+                quantityMultiplier.ToString("0.00"), jackpotMultiplier.ToString("0.00")));
         }
 
         private string FindStatsId(string query)
@@ -980,6 +1010,11 @@ namespace Oxide.Plugins
         private string JackpotRate(PlayerFishingStats stats)
         {
             return stats.Catches > 0 ? (100f * stats.Jackpots / stats.Catches).ToString("0.00") : "0.00";
+        }
+
+        private string CatchRate(PlayerFishingStats stats)
+        {
+            return stats.Casts > 0 ? (100f * stats.Catches / stats.Casts).ToString("0.00") : "0.00";
         }
 
         private string AverageItems(PlayerFishingStats stats)
