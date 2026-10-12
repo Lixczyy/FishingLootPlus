@@ -1,0 +1,557 @@
+{
+  "Enabled": true,
+  "Require fishinglootplus.use permission": false,
+  "Chance (%) to let a vanilla catch through untouched": 10.0,
+  "Global quantity multiplier": 1.0,
+  "Base chance (%) for a bonus roll": 20.0,
+  "Max bonus rolls per catch": 2,
+  "Base jackpot chance (%)": 1.0,
+  "Max jackpot chance (%) after multipliers": 3.0,
+  "Jackpot also gives normal loot": true,
+  "Announce jackpots to the whole server": true,
+  "Show catch message to the player": true,
+  "Jackpot effect prefab (blank = none)": "assets/prefabs/deployable/research table/effects/research-success.prefab",
+  "Location detection distance in front of player (m)": 8.0,
+  "Default bait key (used when no bait is found)": "default",
+  "Default location key (used when water type is unknown)": "Default",
+  "Common loot (applies everywhere)": [
+    {
+      "Shortname": "fish.troutsmall",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 30.0,
+      "Min amount": 1,
+      "Max amount": 2
+    },
+    {
+      "Shortname": "fish.yellowperch",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 25.0,
+      "Min amount": 1,
+      "Max amount": 2
+    },
+    {
+      "Shortname": "fish.herring",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 25.0,
+      "Min amount": 1,
+      "Max amount": 2
+    },
+    {
+      "Shortname": "fish.sardine",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 25.0,
+      "Min amount": 1,
+      "Max amount": 2
+    },
+    {
+      "Shortname": "fish.anchovy",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 25.0,
+      "Min amount": 1,
+      "Max amount": 2
+    },
+    {
+      "Shortname": "fish.salmon",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 18.0,
+      "Min amount": 1,
+      "Max amount": 2
+    },
+    {
+      "Shortname": "fish.catfish",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 14.0,
+      "Min amount": 1,
+      "Max amount": 2
+    },
+    {
+      "Shortname": "fish.orangeroughy",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 10.0,
+      "Min amount": 1,
+      "Max amount": 2
+    },
+    {
+      "Shortname": "fish.smallshark",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 6.0,
+      "Min amount": 1,
+      "Max amount": 2
+    },
+    {
+      "Shortname": "scrap",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 8.0,
+      "Min amount": 5,
+      "Max amount": 20
+    },
+    {
+      "Shortname": "metal.fragments",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 7.0,
+      "Min amount": 50,
+      "Max amount": 200
+    },
+    {
+      "Shortname": "wood",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 7.0,
+      "Min amount": 100,
+      "Max amount": 400
+    },
+    {
+      "Shortname": "stones",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 7.0,
+      "Min amount": 100,
+      "Max amount": 300
+    },
+    {
+      "Shortname": "cloth",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 6.0,
+      "Min amount": 20,
+      "Max amount": 60
+    },
+    {
+      "Shortname": "lowgradefuel",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 5.0,
+      "Min amount": 20,
+      "Max amount": 60
+    },
+    {
+      "Shortname": "sulfur",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 4.0,
+      "Min amount": 30,
+      "Max amount": 100
+    },
+    {
+      "Shortname": "gunpowder",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 4.0,
+      "Min amount": 30,
+      "Max amount": 100
+    },
+    {
+      "Shortname": "charcoal",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 4.0,
+      "Min amount": 100,
+      "Max amount": 250
+    },
+    {
+      "Shortname": "metal.refined",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 2.0,
+      "Min amount": 3,
+      "Max amount": 10
+    },
+    {
+      "Shortname": "ammo.pistol",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 2.0,
+      "Min amount": 10,
+      "Max amount": 30
+    },
+    {
+      "Shortname": "ammo.shotgun",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 1.0,
+      "Min amount": 6,
+      "Max amount": 16
+    },
+    {
+      "Shortname": "syringe.medical",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 2.0,
+      "Min amount": 1,
+      "Max amount": 3
+    },
+    {
+      "Shortname": "gears",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 1.0,
+      "Min amount": 1,
+      "Max amount": 3
+    }
+  ],
+  "Jackpot loot (applies everywhere)": [
+    {
+      "Shortname": "scrap",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 25.0,
+      "Min amount": 150,
+      "Max amount": 400
+    },
+    {
+      "Shortname": "metal.refined",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 20.0,
+      "Min amount": 100,
+      "Max amount": 250
+    },
+    {
+      "Shortname": "sulfur",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 20.0,
+      "Min amount": 300,
+      "Max amount": 800
+    },
+    {
+      "Shortname": "metal.fragments",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 15.0,
+      "Min amount": 1000,
+      "Max amount": 2500
+    },
+    {
+      "Shortname": "supply.signal",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 6.0,
+      "Min amount": 1,
+      "Max amount": 1
+    },
+    {
+      "Shortname": "largemedkit",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 6.0,
+      "Min amount": 2,
+      "Max amount": 4
+    },
+    {
+      "Shortname": "rifle.ak",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 3.0,
+      "Min amount": 1,
+      "Max amount": 1
+    },
+    {
+      "Shortname": "metal.plate.torso",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 3.0,
+      "Min amount": 1,
+      "Max amount": 1
+    },
+    {
+      "Shortname": "metal.facemask",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "",
+      "Weight (higher = more common)": 2.0,
+      "Min amount": 1,
+      "Max amount": 1
+    },
+    {
+      "Shortname": "rifle.ak",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "SUPER JACKPOT: AK-47",
+      "Weight (higher = more common)": 4.17,
+      "Min amount": 1,
+      "Max amount": 1
+    },
+    {
+      "Shortname": "rifle.lr300",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "SUPER JACKPOT: LR-300",
+      "Weight (higher = more common)": 4.17,
+      "Min amount": 1,
+      "Max amount": 1
+    },
+    {
+      "Shortname": "scrap",
+      "Skin ID": 0,
+      "Custom name (blank = default)": "SUPER JACKPOT: Scrap Hoard",
+      "Weight (higher = more common)": 4.17,
+      "Min amount": 3000,
+      "Max amount": 5000
+    }
+  ],
+  "Locations (keys: Ocean, River, Lake, Default)": {
+    "Ocean": {
+      "Display name": "Deep Ocean",
+      "Quantity multiplier": 1.15,
+      "Jackpot chance multiplier": 1.25,
+      "Extra roll chance bonus (percentage points)": 5.0,
+      "Additional loot (added to common pool)": [
+        {
+          "Shortname": "fish.smallshark",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 12.0,
+          "Min amount": 1,
+          "Max amount": 2
+        },
+        {
+          "Shortname": "fish.orangeroughy",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 15.0,
+          "Min amount": 1,
+          "Max amount": 2
+        },
+        {
+          "Shortname": "scrap",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 5.0,
+          "Min amount": 10,
+          "Max amount": 30
+        },
+        {
+          "Shortname": "metal.refined",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 2.0,
+          "Min amount": 5,
+          "Max amount": 15
+        }
+      ],
+      "Additional jackpot loot (added to jackpot pool)": [
+        {
+          "Shortname": "scrap",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 5.0,
+          "Min amount": 150,
+          "Max amount": 400
+        }
+      ]
+    },
+    "River": {
+      "Display name": "River",
+      "Quantity multiplier": 1.05,
+      "Jackpot chance multiplier": 1.05,
+      "Extra roll chance bonus (percentage points)": 2.0,
+      "Additional loot (added to common pool)": [
+        {
+          "Shortname": "fish.salmon",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 15.0,
+          "Min amount": 1,
+          "Max amount": 2
+        },
+        {
+          "Shortname": "fish.catfish",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 12.0,
+          "Min amount": 1,
+          "Max amount": 2
+        },
+        {
+          "Shortname": "metal.ore",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 5.0,
+          "Min amount": 100,
+          "Max amount": 300
+        },
+        {
+          "Shortname": "sulfur.ore",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 4.0,
+          "Min amount": 60,
+          "Max amount": 200
+        },
+        {
+          "Shortname": "stones",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 4.0,
+          "Min amount": 150,
+          "Max amount": 400
+        }
+      ],
+      "Additional jackpot loot (added to jackpot pool)": [
+        {
+          "Shortname": "hq.metal.ore",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 5.0,
+          "Min amount": 200,
+          "Max amount": 500
+        }
+      ]
+    },
+    "Lake": {
+      "Display name": "Lake",
+      "Quantity multiplier": 1.1,
+      "Jackpot chance multiplier": 1.15,
+      "Extra roll chance bonus (percentage points)": 3.0,
+      "Additional loot (added to common pool)": [
+        {
+          "Shortname": "fish.yellowperch",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 18.0,
+          "Min amount": 1,
+          "Max amount": 2
+        },
+        {
+          "Shortname": "fish.herring",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 15.0,
+          "Min amount": 1,
+          "Max amount": 2
+        },
+        {
+          "Shortname": "gunpowder",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 3.0,
+          "Min amount": 30,
+          "Max amount": 100
+        }
+      ],
+      "Additional jackpot loot (added to jackpot pool)": [
+        {
+          "Shortname": "scrap",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 5.0,
+          "Min amount": 150,
+          "Max amount": 400
+        }
+      ]
+    },
+    "Default": {
+      "Display name": "Open Water",
+      "Quantity multiplier": 1.0,
+      "Jackpot chance multiplier": 1.0,
+      "Extra roll chance bonus (percentage points)": 0.0,
+      "Additional loot (added to common pool)": [],
+      "Additional jackpot loot (added to jackpot pool)": []
+    }
+  },
+  "Baits (key = bait item shortname, or 'default')": {
+    "default": {
+      "Display name": "No bait",
+      "Quantity multiplier": 1.0,
+      "Jackpot chance multiplier": 1.0,
+      "Extra roll chance bonus (percentage points)": 0.0,
+      "Additional loot (added to common pool)": [],
+      "Additional jackpot loot (added to jackpot pool)": []
+    },
+    "worm": {
+      "Display name": "Worm",
+      "Quantity multiplier": 1.05,
+      "Jackpot chance multiplier": 1.1,
+      "Extra roll chance bonus (percentage points)": 2.0,
+      "Additional loot (added to common pool)": [
+        {
+          "Shortname": "cloth",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 4.0,
+          "Min amount": 20,
+          "Max amount": 60
+        }
+      ],
+      "Additional jackpot loot (added to jackpot pool)": []
+    },
+    "grub": {
+      "Display name": "Grub",
+      "Quantity multiplier": 1.1,
+      "Jackpot chance multiplier": 1.25,
+      "Extra roll chance bonus (percentage points)": 4.0,
+      "Additional loot (added to common pool)": [
+        {
+          "Shortname": "lowgradefuel",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 4.0,
+          "Min amount": 30,
+          "Max amount": 80
+        },
+        {
+          "Shortname": "sulfur",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 3.0,
+          "Min amount": 40,
+          "Max amount": 120
+        }
+      ],
+      "Additional jackpot loot (added to jackpot pool)": []
+    },
+    "fish.anchovy": {
+      "Display name": "Anchovy (premium bait)",
+      "Quantity multiplier": 1.2,
+      "Jackpot chance multiplier": 1.5,
+      "Extra roll chance bonus (percentage points)": 8.0,
+      "Additional loot (added to common pool)": [
+        {
+          "Shortname": "metal.refined",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 3.0,
+          "Min amount": 5,
+          "Max amount": 15
+        },
+        {
+          "Shortname": "largemedkit",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 2.0,
+          "Min amount": 1,
+          "Max amount": 1
+        }
+      ],
+      "Additional jackpot loot (added to jackpot pool)": [
+        {
+          "Shortname": "rifle.ak",
+          "Skin ID": 0,
+          "Custom name (blank = default)": "",
+          "Weight (higher = more common)": 1.0,
+          "Min amount": 1,
+          "Max amount": 1
+        }
+      ]
+    }
+  },
+  "Luck permissions": {
+    "fishinglootplus.vip": {
+      "Quantity multiplier": 1.1,
+      "Jackpot chance multiplier": 1.1
+    },
+    "fishinglootplus.god": {
+      "Quantity multiplier": 1.25,
+      "Jackpot chance multiplier": 1.4
+    }
+  }
+}
