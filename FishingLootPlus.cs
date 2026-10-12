@@ -17,14 +17,30 @@ namespace Oxide.Plugins
 
         private const string PermAdmin = "fishinglootplus.admin";
         private const string PermUse = "fishinglootplus.use";
+        private const string PermVip = "fishinglootplus.vip";
+        private const string PermGod = "fishinglootplus.god";
+        private const string PlayerStatsDataFile = "FishingLootPlus_PlayerStats";
+        private const int VipCatchThreshold = 100;
+        private const int GodCatchThreshold = 500;
 
         private ConfigData config;
         private readonly Dictionary<string, ItemDefinition> defCache = new Dictionary<string, ItemDefinition>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> registeredPerms = new HashSet<string>();
+        private Dictionary<string, PlayerFishingStats> playerStats = new Dictionary<string, PlayerFishingStats>();
 
         private int statCatches;
         private int statJackpots;
         private long statItems;
+
+        private class PlayerFishingStats
+        {
+            public string Name = "";
+            public int Catches;
+            public int Jackpots;
+            public long Items;
+            public int RewardDrops;
+            public int BonusRolls;
+        }
 
         #endregion
 
@@ -344,8 +360,8 @@ namespace Oxide.Plugins
             };
 
             // ---------- LUCK PERMISSIONS ----------
-            c.LuckPermissions["fishinglootplus.vip"] = new LuckTier { QuantityMultiplier = 1.25f, JackpotChanceMultiplier = 1.25f };
-            c.LuckPermissions["fishinglootplus.god"] = new LuckTier { QuantityMultiplier = 2f, JackpotChanceMultiplier = 3f };
+            c.LuckPermissions[PermVip] = new LuckTier { QuantityMultiplier = 1.25f, JackpotChanceMultiplier = 1.25f };
+            c.LuckPermissions[PermGod] = new LuckTier { QuantityMultiplier = 2f, JackpotChanceMultiplier = 3f };
 
             return c;
         }
@@ -369,6 +385,25 @@ namespace Oxide.Plugins
 
         protected override void LoadDefaultConfig() { config = CreateDefaultConfig(); }
         protected override void SaveConfig() { Config.WriteObject(config, true); }
+
+        private void LoadPlayerStats()
+        {
+            try
+            {
+                playerStats = Interface.Oxide.DataFileSystem.ReadObject<Dictionary<string, PlayerFishingStats>>(PlayerStatsDataFile)
+                    ?? new Dictionary<string, PlayerFishingStats>();
+            }
+            catch (Exception ex)
+            {
+                PrintWarning("Player fishing stats could not be loaded: " + ex.Message);
+                playerStats = new Dictionary<string, PlayerFishingStats>();
+            }
+        }
+
+        private void SavePlayerStats()
+        {
+            Interface.Oxide.DataFileSystem.WriteObject(PlayerStatsDataFile, playerStats);
+        }
 
         private void Sanitize()
         {
@@ -443,6 +478,8 @@ namespace Oxide.Plugins
                 ["Toggled"] = "FishingLootPlus is now {0}.",
                 ["PlayerNotFound"] = "Player '{0}' not found (or not online).",
                 ["Given"] = "Gave {0} a roll: {1}",
+                ["Stats"] = "== Fishing stats: {0} ==\nRank: {1}\nCatches: {2}\nJackpots: {3}\nJackpot rate: {4}%\nItems received: {5}\nReward drops: {6}\nBonus rolls: {7}\nAverage items/catch: {8}\nFishing multiplier: x{9} quantity / x{10} jackpot",
+                ["Leaderboard"] = "== Fishing leaderboard ==\n{0}",
                 ["Help"] = "FishingLootPlus commands:\n" +
                            "/fishloot reload - reload config\n" +
                            "/fishloot toggle - enable/disable\n" +
@@ -466,13 +503,19 @@ namespace Oxide.Plugins
 
         private void Init()
         {
+            LoadPlayerStats();
             RegisterPerms();
             AddCovalenceCommand("fishloot", nameof(CmdFishLoot));
+            AddCovalenceCommand("lb", nameof(CmdLeaderboard));
+            AddCovalenceCommand("stats", nameof(CmdStats));
         }
 
         private void OnServerInitialized()
         {
             int bad = ValidateConfig();
+            foreach (var entry in playerStats)
+                GrantCatchPermissions(entry.Key, entry.Value);
+            SavePlayerStats();
             Puts("Loaded. " + (bad == 0 ? "All loot entries valid." : bad + " invalid entries (see warnings)."));
         }
 
@@ -481,6 +524,8 @@ namespace Oxide.Plugins
             if (config == null || !config.Enabled || fish == null || rod == null || player == null) return null;
 
             if (config.RequirePermission && !permission.UserHasPermission(player.UserIDString, PermUse)) return null;
+
+            var stats = RecordCatch(player);
 
             // Let some catches stay vanilla ("Vanilla + custom")
             if (Roll(config.VanillaPassthroughChance)) return null;
@@ -496,6 +541,11 @@ namespace Oxide.Plugins
             NextTick(() => { if (fish != null) fish.Remove(); });
 
             DeliverRewards(player, result);
+            stats.Jackpots += result.Jackpot ? 1 : 0;
+            stats.Items += result.Rewards.Sum(r => (long)r.Amount);
+            stats.RewardDrops += result.Rewards.Count;
+            stats.BonusRolls += result.BonusRolls;
+            SavePlayerStats();
             return true;
         }
 
@@ -518,6 +568,7 @@ namespace Oxide.Plugins
             public string BaitKey;
             public string LocationName;
             public string BaitName;
+            public int BonusRolls;
         }
 
         private RollResult Generate(string locKey, string baitKey, float luckQty, float luckJackpot, bool forceJackpot)
@@ -554,6 +605,7 @@ namespace Oxide.Plugins
                     if (Roll(extraChance)) rolls++;
                     else break;
                 }
+                res.BonusRolls = rolls - 1;
 
                 var pool = BuildPool(lp, bp, false);
                 for (int i = 0; i < rolls; i++)
@@ -581,8 +633,6 @@ namespace Oxide.Plugins
                 target.Append(text);
                 statItems += r.Amount;
             }
-
-            statCatches++;
 
             if (result.Jackpot)
             {
@@ -746,12 +796,196 @@ namespace Oxide.Plugins
                 float score = kv.Value.QuantityMultiplier + kv.Value.JackpotChanceMultiplier;
                 if (score > bestScore) { best = kv.Value; bestScore = score; }
             }
+
+            PlayerFishingStats stats;
+            if (playerStats.TryGetValue(player.UserIDString, out stats))
+            {
+                LuckTier catchTier;
+                if (stats.Catches >= GodCatchThreshold && config.LuckPermissions.TryGetValue(PermGod, out catchTier))
+                {
+                    float score = catchTier.QuantityMultiplier + catchTier.JackpotChanceMultiplier;
+                    if (score > bestScore) { best = catchTier; bestScore = score; }
+                }
+                else if (stats.Catches >= VipCatchThreshold && config.LuckPermissions.TryGetValue(PermVip, out catchTier))
+                {
+                    float score = catchTier.QuantityMultiplier + catchTier.JackpotChanceMultiplier;
+                    if (score > bestScore) { best = catchTier; bestScore = score; }
+                }
+            }
             return best;
+        }
+
+        private PlayerFishingStats RecordCatch(BasePlayer player)
+        {
+            PlayerFishingStats stats;
+            if (!playerStats.TryGetValue(player.UserIDString, out stats))
+            {
+                stats = new PlayerFishingStats();
+                playerStats[player.UserIDString] = stats;
+            }
+
+            stats.Name = player.displayName;
+            stats.Catches++;
+            statCatches++;
+            GrantCatchPermissions(player.UserIDString, stats);
+            SavePlayerStats();
+            return stats;
+        }
+
+        private void GrantCatchPermissions(string userId, PlayerFishingStats stats)
+        {
+            if (stats == null) return;
+
+            if (stats.Catches >= VipCatchThreshold && config.LuckPermissions.ContainsKey(PermVip) &&
+                !permission.UserHasPermission(userId, PermVip))
+                permission.GrantUserPermission(userId, PermVip, this);
+
+            if (stats.Catches >= GodCatchThreshold && config.LuckPermissions.ContainsKey(PermGod) &&
+                !permission.UserHasPermission(userId, PermGod))
+                permission.GrantUserPermission(userId, PermGod, this);
         }
 
         #endregion
 
         #region Commands
+
+        private void CmdLeaderboard(IPlayer iplayer, string command, string[] args)
+        {
+            var ranked = playerStats.Values
+                .Where(s => s != null)
+                .OrderByDescending(s => s.Catches)
+                .ThenByDescending(s => s.Jackpots)
+                .ThenBy(s => s.Name)
+                .ToList();
+
+            var sb = new StringBuilder();
+            if (ranked.Count == 0)
+            {
+                sb.Append("No fishing catches have been recorded yet.");
+            }
+            else
+            {
+                int shown = Math.Min(3, ranked.Count);
+                for (int i = 0; i < shown; i++)
+                    sb.AppendLine("#" + (i + 1) + " " + DisplayStatsName(ranked[i]) + " - " +
+                                  ranked[i].Catches + " catches, " + JackpotRate(ranked[i]) + "% jackpot rate");
+
+                if (!iplayer.IsServer)
+                {
+                    int ownIndex = FindStatsIndex(ranked, iplayer.Id);
+                    if (ownIndex >= 0)
+                        sb.Append("Your rank: #" + (ownIndex + 1) + " (" + ranked[ownIndex].Catches + " catches)");
+                    else
+                        sb.Append("Your rank: unranked (catch something to enter the leaderboard)");
+                }
+            }
+
+            iplayer.Reply(Msg("Leaderboard", iplayer.Id, sb.ToString().TrimEnd()));
+        }
+
+        private void CmdStats(IPlayer iplayer, string command, string[] args)
+        {
+            string id;
+            PlayerFishingStats stats;
+            string requestedName = args != null && args.Length > 0 ? string.Join(" ", args).Trim() : null;
+
+            if (string.IsNullOrEmpty(requestedName))
+            {
+                if (iplayer.IsServer)
+                {
+                    iplayer.Reply("The server cannot view personal stats. Use /stats <player>.");
+                    return;
+                }
+                id = iplayer.Id;
+                playerStats.TryGetValue(id, out stats);
+                if (stats == null)
+                    stats = new PlayerFishingStats { Name = iplayer.Name };
+            }
+            else
+            {
+                id = FindStatsId(requestedName);
+                stats = id != null ? playerStats[id] : null;
+            }
+
+            if (stats == null)
+            {
+                iplayer.Reply(Msg("PlayerNotFound", iplayer.Id, requestedName ?? iplayer.Name));
+                return;
+            }
+
+            var ranked = playerStats.Values
+                .Where(s => s != null)
+                .OrderByDescending(s => s.Catches)
+                .ThenByDescending(s => s.Jackpots)
+                .ThenBy(s => s.Name)
+                .ToList();
+            int rank = FindStatsIndex(ranked, id) + 1;
+            float quantityMultiplier = 1f;
+            float jackpotMultiplier = 1f;
+            var target = covalence.Players.FindPlayer(id);
+            var targetPlayer = target != null ? target.Object as BasePlayer : null;
+            if (targetPlayer != null)
+            {
+                var luck = GetLuck(targetPlayer);
+                quantityMultiplier = luck.QuantityMultiplier;
+                jackpotMultiplier = luck.JackpotChanceMultiplier;
+            }
+            else if (stats.Catches >= GodCatchThreshold && config.LuckPermissions.ContainsKey(PermGod))
+            {
+                quantityMultiplier = config.LuckPermissions[PermGod].QuantityMultiplier;
+                jackpotMultiplier = config.LuckPermissions[PermGod].JackpotChanceMultiplier;
+            }
+            else if (stats.Catches >= VipCatchThreshold && config.LuckPermissions.ContainsKey(PermVip))
+            {
+                quantityMultiplier = config.LuckPermissions[PermVip].QuantityMultiplier;
+                jackpotMultiplier = config.LuckPermissions[PermVip].JackpotChanceMultiplier;
+            }
+
+            iplayer.Reply(Msg("Stats", iplayer.Id, DisplayStatsName(stats), rank > 0 ? "#" + rank : "unranked",
+                stats.Catches, stats.Jackpots, JackpotRate(stats), stats.Items, stats.RewardDrops,
+                stats.BonusRolls, AverageItems(stats), quantityMultiplier.ToString("0.00"),
+                jackpotMultiplier.ToString("0.00")));
+        }
+
+        private string FindStatsId(string query)
+        {
+            var online = covalence.Players.FindPlayer(query);
+            if (online != null && playerStats.ContainsKey(online.Id)) return online.Id;
+
+            foreach (var entry in playerStats)
+                if (entry.Value != null &&
+                    (string.Equals(entry.Key, query, StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(entry.Value.Name, query, StringComparison.OrdinalIgnoreCase)))
+                    return entry.Key;
+
+            foreach (var entry in playerStats)
+                if (entry.Value != null && !string.IsNullOrEmpty(entry.Value.Name) &&
+                    entry.Value.Name.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
+                    return entry.Key;
+            return null;
+        }
+
+        private int FindStatsIndex(List<PlayerFishingStats> ranked, string userId)
+        {
+            PlayerFishingStats stats;
+            if (!playerStats.TryGetValue(userId, out stats)) return -1;
+            return ranked.IndexOf(stats);
+        }
+
+        private string DisplayStatsName(PlayerFishingStats stats)
+        {
+            return stats == null || string.IsNullOrEmpty(stats.Name) ? "Unknown player" : stats.Name;
+        }
+
+        private string JackpotRate(PlayerFishingStats stats)
+        {
+            return stats.Catches > 0 ? (100f * stats.Jackpots / stats.Catches).ToString("0.00") : "0.00";
+        }
+
+        private string AverageItems(PlayerFishingStats stats)
+        {
+            return stats.Catches > 0 ? ((float)stats.Items / stats.Catches).ToString("0.00") : "0.00";
+        }
 
         private void CmdFishLoot(IPlayer iplayer, string command, string[] args)
         {

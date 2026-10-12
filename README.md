@@ -12,8 +12,10 @@ The plugin is built around a simple idea: most catches are still valid fish, but
 - Location-specific loot profiles for Ocean, River, Lake, and default water.
 - Bait-specific modifiers that affect quantity, jackpot chance, and extra-roll chance.
 - Permission-based luck multipliers for VIP or admin-tier fishing bonuses.
+- Persistent per-player fishing progression with automatic VIP at 100 catches and God at 500 catches.
+- Public `/lb` leaderboard and `/stats` commands for personal and player statistics.
 - In-game commands for validation, simulation, testing, and admin forcing.
-- Session stats for catch counts, jackpots, and total items distributed.
+- Persistent player stats for catches, jackpots, jackpot rate, items, reward drops, and bonus rolls.
 - Configurable item display names, custom skin IDs, and weighted loot entries.
 
 ## Supported game and framework
@@ -138,6 +140,10 @@ The plugin registers and uses these permissions:
 - `fishinglootplus.admin` — required to use admin commands.
 - Any custom permissions defined under `Luck permissions`.
 
+Players are automatically granted `fishinglootplus.vip` after 100 successful catches and
+`fishinglootplus.god` after 500 successful catches. These thresholds use the configured VIP and God
+luck multipliers and persist across restarts.
+
 If you want players to be able to use the plugin without the use permission, disable the requirement in config.
 
 ## Commands
@@ -154,12 +160,27 @@ Enables or disables fishing rewards globally.
 
 ### /fishloot stats
 
-Displays session stats:
+Displays plugin session stats for administrators:
 
 - total catches handled
 - total jackpots
 - total items awarded
 - jackpot percentage
+
+### /lb
+
+Available to everyone. Displays the top three players by catches and the requesting player's current rank.
+The leaderboard also shows each listed player's jackpot rate.
+
+### /stats
+
+Available to everyone. Displays your persistent fishing statistics, effective quantity and jackpot
+multipliers, and leaderboard rank.
+
+### /stats <player>
+
+Displays the persistent fishing statistics for an online player or a player already recorded in the
+leaderboard. Partial name matches are supported.
 
 ### /fishloot list
 
